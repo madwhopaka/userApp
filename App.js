@@ -4,6 +4,9 @@ import Login from './screens/Login';
 import Profile from './screens/Profile';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Mapview from './screens/Mapview';
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +25,9 @@ export default function App() {
         <Stack.Screen name="Profile" component={Profile} options={{
           headerShown: false
         }} />
-
+        <Stack.Screen name="Mapview" component={Mapview} options={{
+          headerShown: false
+        }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

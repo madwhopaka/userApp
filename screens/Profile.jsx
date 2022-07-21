@@ -1,84 +1,43 @@
-import { Text, View, StatusBar, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Text, View, StatusBar, StyleSheet, TouchableOpacity, Image, } from "react-native";
 import { color } from "../color";
+import { useEffect, useState } from "react";
+import * as Location from "expo-location";
 
 
+var foregroundSubscription = null;
 
 function Profile({ navigation, route }) {
-    const styles = StyleSheet.create({
-        greenView: {
-            flex: 0.3017,
-            flexDirection: 'row',
-            backgroundColor: color.primaryGreen,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            width: '100%',
-        },
-        whiteView: {
-            flex: 0.6983,
-            backgroundColor: 'white',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            width: '100%',
-        },
-        innerGreen: {
-            marginTop: 60,
-            flexDirection: 'row',
-            width: '100%',
-            alignItems: 'center',
-            justifyContent: 'center'
+    const [loc, setLocation] = useState({ lat: '', long: '' });
 
+    const watchLocationChange = async () => {
+        // Check if foreground permission is granted
+        const { status } = await Location.getForegroundPermissionsAsync()
+        if (status != 'granted') {
+            console.log("location tracking denied");
+            return
+        }
 
-        },
-        profileLabel: {
-            fontSize: 30,
-            textAlign: 'center',
-            fontWeight: '600',
-            color: 'white',
-        },
-        logoutButton: {
-            position: 'absolute',
-            right: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
+        foregroundSubscription?.remove()
+        foregroundSubscription = await Location.watchPositionAsync(
+            {
+
+                accuracy: Location.Accuracy.BestForNavigation,
+                timeInterval: 2000,
+                distanceInterval: 1,
+            },
+            location => {
+                setLocation({ lat: location.coords.latitude, long: location.coords.longitude });
+                console.log(loc.lat, loc.long);
+            }
+        )
+    }
+    useEffect(() => {
+        watchLocationChange();
+        return () => {
+            foregroundSubscription?.remove();
         }
-        ,
-        logoutLabel: {
-            color: 'white',
-            fontWeight: '400',
-            fontSize: 16,
-        },
-        user: {
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 57,
-            marginBottom: 69,
-        },
-        userName: {
-            fontSize: 30,
-            fontWeight: '600',
-            marginBottom: 10,
-        },
-        address: {
-            fontWeight: '600',
-            fontSize: 16,
-        },
-        location: {
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        locationLabel: {
-            color: '#EF3840',
-            fontSize: 16,
-            fontWeight: '700',
-            lineHeight: 19.36,
-        },
-        cordinates: {
-            color: 'black',
-            fontSize: 16,
-            fontWeight: '700',
-            lineHeight: 19.36,
-        }
-    })
+    }, []);
+
     return (
         <View style={{ zIndex: -4000, flex: 1 }}><Image style={{
             position: 'absolute', alignSelf: 'center', top: 120, shadowColor: '#202020',
@@ -89,7 +48,8 @@ function Profile({ navigation, route }) {
                 <View style={styles.greenView}>
                     <View style={styles.innerGreen}>
                         <Text style={styles.profileLabel}>Profile</Text>
-                        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.goBack()}><Text style={styles.logoutLabel}>Logout</Text></TouchableOpacity>
+
+                        <TouchableOpacity style={styles.logoutButton} onPress={() => { foregroundSubscription?.remove(); navigation.goBack(); }}><Text style={styles.logoutLabel}>Logout</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.whiteView}>
@@ -99,13 +59,92 @@ function Profile({ navigation, route }) {
                     </View>
                     <View style={styles.location}>
                         <Text style={styles.locationLabel}>Your Location</Text>
-                        <Text style={styles.cordinates}>Longitude</Text>
+                        {loc.lat != "" && loc.long != "" ? <TouchableOpacity activeOpacity={0.8} onPress={() => {
+                            foregroundSubscription?.remove();
+                            navigation.navigate('Mapview', { loc: loc })
+                        }}><Text style={styles.cordinates}>{loc.lat + "N, " + loc.long + "E"}</Text></TouchableOpacity> : <Text>Location Loading...!</Text>}
                     </View>
                 </View>
 
             </View>
-        </View>
+        </View >
     )
 }
 
-export default Profile
+const styles = StyleSheet.create({
+    greenView: {
+        flex: 0.3017,
+        flexDirection: 'row',
+        backgroundColor: color.primaryGreen,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        width: '100%',
+    },
+    whiteView: {
+        flex: 0.6983,
+        backgroundColor: 'white',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        width: '100%',
+    },
+    innerGreen: {
+        marginTop: 60,
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
+
+
+    },
+    profileLabel: {
+        fontSize: 30,
+        textAlign: 'center',
+        fontWeight: '600',
+        color: 'white',
+    },
+    logoutButton: {
+        position: 'absolute',
+        right: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+    ,
+    logoutLabel: {
+        color: 'white',
+        fontWeight: '400',
+        fontSize: 16,
+    },
+    user: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 57,
+        marginBottom: 69,
+    },
+    userName: {
+        fontSize: 30,
+        fontWeight: '600',
+        marginBottom: 10,
+    },
+    address: {
+        fontWeight: '600',
+        fontSize: 16,
+    },
+    location: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    locationLabel: {
+        color: '#EF3840',
+        fontSize: 16,
+        fontWeight: '700',
+        lineHeight: 19.36,
+    },
+    cordinates: {
+        color: 'black',
+        fontSize: 16,
+        fontWeight: '700',
+        lineHeight: 19.36,
+    }
+})
+
+export default Profile;
