@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, StatusBar, TextInput, useWindowDimensions, Alert } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, TextInput, Dimensions, Alert } from 'react-native';
 import InputField from '../components/InputField';
 import PrimaryButton from '../components/PrimaryButton';
 import { useState } from 'react';
@@ -10,27 +10,26 @@ import * as Location from "expo-location";
 function Login({ navigation }) {
     const [showPass, setShowPass] = useState(false);
     const [cred, setCred] = useState({ email: '', password: '' });
-
-    var foregroundPermission;
     const getPermision = async () => {
-        await Location.enableNetworkProviderAsync();
-        return await Location.getForegroundPermissionsAsync();
+        await Location.requestForegroundPermissionsAsync();
     }
 
-
     useEffect(() => {
-        foregroundPermission = getPermision();
+        getPermision();
     }, [])
 
     const handleLogin = async () => {
+        const { status } = await Location.getForegroundPermissionsAsync()
         if (cred.email === "" || cred.password === "") {
             console.log("hello");
             Alert.alert("Please fill in valid credentials");
             return;
         }
-        else if (foregroundPermission?.status !== 'granted') {
-            foregroundPermission = await getPermision();
-            if (foregroundPermission?.status === 'granted') {
+        else if (status !== 'granted') {
+            getPermision();
+            const { status } = await Location.getForegroundPermissionsAsync();
+            setCred({ email: "", password: "" });
+            if (status === 'granted') {
                 const user = await login();
                 setCred({ email: "", password: "" });
                 navigation.navigate({ name: 'Profile', params: { user: user } });
@@ -47,6 +46,7 @@ function Login({ navigation }) {
         }
         else {
             const user = await login();
+            setCred({ email: "", password: "" });
             navigation.navigate({ name: 'Profile', params: { user: user } });
         }
 
@@ -58,16 +58,16 @@ function Login({ navigation }) {
             width: '100%',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            paddingTop: 60,
+            paddingTop: Dimensions.get('window').width * 0.153
         },
         title: {
-            fontSize: 30,
+            fontSize: Dimensions.get('window').height / Dimensions.get('window').width * 14.613,
             fontWeight: '600',
         },
 
         inputContainer: {
-            paddingHorizontal: 16,
-            marginTop: 32,
+            paddingHorizontal: Dimensions.get('window').width * 0.041,
+            marginTop: Dimensions.get('window').height * 0.034,
         }
     })
 
@@ -75,8 +75,8 @@ function Login({ navigation }) {
         <View style={styles.loginContainer}>
             <Text style={styles.title}>Log In</Text>
             <View style={styles.inputContainer}>
-                <InputField value={cred.email} placeholder={'Email'} textContentType="emailAddress" onChangeText={(e) => setCred({ ...cred, email: e })} />
-                <InputField value={cred.password} placeholder={'Password'} secureTextEntry={!showPass} textContentType={'password'} onChangeText={(e) => setCred({ ...cred, password: e })} password={true} showPass={showPass} setShowPass={setShowPass} />
+                <InputField v={cred.email} placeholder={'Email'} textContentType="emailAddress" onChangeText={(e) => setCred({ ...cred, email: e })} />
+                <InputField v={cred.password} placeholder={'Password'} secureTextEntry={!showPass} textContentType={'password'} onChangeText={(e) => setCred({ ...cred, password: e })} password={true} showPass={showPass} setShowPass={setShowPass} />
                 <PrimaryButton handleClick={handleLogin} />
             </View>
         </View>

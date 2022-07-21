@@ -1,4 +1,4 @@
-import { Text, View, StatusBar, StyleSheet, TouchableOpacity, Image, } from "react-native";
+import { Text, View, StatusBar, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
 import { color } from "../color";
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
@@ -40,7 +40,7 @@ function Profile({ navigation, route }) {
 
     return (
         <View style={{ zIndex: -4000, flex: 1 }}><Image style={{
-            position: 'absolute', alignSelf: 'center', top: 120, shadowColor: '#202020',
+            position: 'absolute', alignSelf: 'center', top: Dimensions.get('window').height * 0.1488, shadowColor: '#202020',
             shadowOffset: { width: 0, height: 0 },
             shadowRadius: 5, zIndex: 100
         }} source={require('../assets/avatar.png')} />
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     innerGreen: {
-        marginTop: 60,
+        marginTop: Dimensions.get('window').height * 0.0744,  // 60 
         flexDirection: 'row',
         width: '100%',
         alignItems: 'center',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         position: 'absolute',
-        right: 20,
+        right: Dimensions.get('window').width * 0.051,
         justifyContent: 'center',
         alignItems: 'center',
     }
@@ -117,13 +117,13 @@ const styles = StyleSheet.create({
     user: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 57,
-        marginBottom: 69,
+        marginTop: Dimensions.get('window').height * 0.071,           //57       
+        marginBottom: Dimensions.get('window').height * 0.0856,                 //69
     },
     userName: {
         fontSize: 30,
         fontWeight: '600',
-        marginBottom: 10,
+        marginBottom: Dimensions.get('window').height * 0.0124,
     },
     address: {
         fontWeight: '600',

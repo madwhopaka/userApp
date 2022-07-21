@@ -1,15 +1,15 @@
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
 import { color } from "../color";
 
 export default function PrimaryButton({ handleClick }) {
     const styles = StyleSheet.create({
         buttonContainer: {
             position: 'absolute',
-            left: 16,
-            top: 321,
-            width: 355,
-            paddingHorizontal: 32,
-            paddingVertical: 16,
+            left: Dimensions.get('window').width * 0.041,
+            top: Dimensions.get('window').height * 0.399,
+            width: Dimensions.get('window').width * 0.903,
+            paddingHorizontal: Dimensions.get('window').width * 0.0815,
+            paddingVertical: Dimensions.get('window').height * 0.01985,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 30,
